@@ -1,0 +1,549 @@
+<!doctype html>
+<!-- PPTX에서 폰트·이미지·색상·벡터를 꺼내 보여 주는 단일 파일 웹앱 (감각소) -->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>감각소 — PPTX 에셋 추출</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+  :root{
+    --paper:#f3efe6; --paper-2:#ece5d6; --card:#faf7f0;
+    --ink:#1c1a17; --ink-mid:#6b6457; --line:#d9d1be; --accent:#c0432a;
+    --shadow:0 1px 0 #fff8 inset, 0 14px 30px -18px #5a4a2a55;
+    --font-display:'Gowun Batang', serif;
+    --font-sans:'IBM Plex Sans KR', system-ui, sans-serif;
+    --font-mono:'IBM Plex Mono', ui-monospace, monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:var(--font-sans); color:var(--ink); background:var(--paper);
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='3' height='3'%3E%3Crect width='3' height='3' fill='%23f3efe6'/%3E%3Ccircle cx='1' cy='1' r='.4' fill='%23d9d1be' opacity='.4'/%3E%3C/svg%3E");
+    line-height:1.55; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:920px; margin:0 auto; padding:48px 22px 80px}
+
+  header{border-bottom:1.5px solid var(--ink); padding-bottom:20px; margin-bottom:34px}
+  .brand{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap}
+  .brand h1{
+    font-family:var(--font-display); font-weight:700; font-size:clamp(40px,8vw,68px);
+    letter-spacing:.01em; margin:0; line-height:.95;
+  }
+  .brand .en{font-family:var(--font-mono); font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent)}
+  .tagline{margin:16px 0 0; color:var(--ink-mid); font-family:var(--font-sans); font-weight:300; font-size:14px; line-height:1.75}
+
+  nav{margin-top:16px; display:flex; gap:20px; flex-wrap:wrap}
+  nav a{font-family:var(--font-sans); font-size:14px; font-weight:500; color:var(--ink-mid); text-decoration:none}
+  nav a:hover{color:var(--accent)}
+  nav a.current{color:var(--ink); border-bottom:1.5px solid var(--ink); padding-bottom:2px}
+
+  /* 드롭존 */
+  .drop{
+    border:1.5px dashed var(--line); border-radius:4px; background:var(--card);
+    padding:54px 24px; text-align:center; cursor:pointer; transition:.18s ease;
+    box-shadow:var(--shadow);
+  }
+  .drop:hover{border-color:var(--accent); transform:translateY(-1px)}
+  .drop.over{border-color:var(--accent); border-style:solid; background:#fff}
+  .drop.busy{cursor:progress; opacity:.7}
+  .drop .mark{font-family:var(--font-display); font-size:44px; color:var(--accent); line-height:1}
+  .drop .big{font-size:18px; margin-top:14px; font-weight:500}
+  .drop .small{font-size:13px; color:var(--ink-mid); margin-top:4px}
+  .drop input{display:none}
+
+  .hidden{display:none !important}
+
+  /* 파일 칩 */
+  .filebar{display:flex; align-items:center; gap:12px; margin-bottom:18px; flex-wrap:wrap}
+  .chip{
+    display:inline-flex; align-items:center; gap:8px; background:var(--ink); color:var(--paper);
+    font-family:var(--font-mono); font-size:13px; padding:7px 12px; border-radius:3px;
+  }
+  .chip .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+  .linkbtn{background:none;border:none;color:var(--accent);font-family:var(--font-sans);font-size:13px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:0}
+
+  /* 탭 */
+  .tabs{display:flex; gap:4px; border-bottom:1.5px solid var(--ink); margin-bottom:22px; flex-wrap:wrap}
+  .tab{
+    font-family:var(--font-sans); font-size:15px; font-weight:500; color:var(--ink-mid);
+    background:none; border:1.5px solid transparent; border-bottom:none; cursor:pointer;
+    padding:9px 16px; border-radius:4px 4px 0 0; margin-bottom:-1.5px; transition:.15s ease;
+  }
+  .tab:hover{color:var(--ink)}
+  .tab.active{color:var(--ink); background:var(--card); border-color:var(--ink); font-weight:600}
+  .tab .cnt{font-family:var(--font-mono); font-size:12px; color:var(--accent); margin-left:6px}
+
+  .sec-note{color:var(--ink-mid); font-size:13.5px; margin:0 0 16px}
+  .empty{color:var(--ink-mid); font-size:14px; padding:30px 4px; text-align:center; font-style:italic}
+
+  .panel{display:none}
+  .panel.active{display:block}
+
+  /* 폰트 행 */
+  .font{
+    background:var(--card); border:1px solid var(--line); border-radius:4px;
+    padding:14px 18px; margin-bottom:10px; box-shadow:var(--shadow);
+    display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
+    opacity:0; transform:translateY(8px); animation:rise .4s ease forwards;
+  }
+  @keyframes rise{to{opacity:1; transform:none}}
+  .font .name{font-family:var(--font-mono); font-size:18px; font-weight:500; word-break:break-word}
+  .badges{display:flex; gap:6px; flex-wrap:wrap}
+  .badge{font-size:11px; font-family:var(--font-mono); letter-spacing:.04em; padding:3px 8px; border-radius:999px; border:1px solid var(--line); color:var(--ink-mid); background:#fff8}
+  .badge.embed{border-color:var(--accent); color:var(--accent)}
+
+  /* 이미지 / 벡터 그리드 */
+  .toolbar{display:flex; justify-content:flex-end; margin-bottom:14px}
+  .btn{
+    font-family:var(--font-sans); font-size:13.5px; font-weight:500; cursor:pointer;
+    background:var(--ink); color:var(--paper); border:none; padding:9px 16px; border-radius:3px;
+    transition:.15s ease;
+  }
+  .btn:hover{background:var(--accent)}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:14px}
+  .asset{
+    background:var(--card); border:1px solid var(--line); border-radius:4px; overflow:hidden;
+    box-shadow:var(--shadow); display:flex; flex-direction:column;
+    opacity:0; transform:translateY(8px); animation:rise .4s ease forwards;
+  }
+  .asset .thumb{
+    height:130px; display:flex; align-items:center; justify-content:center;
+    background:
+      linear-gradient(45deg,#0000 46%,#e3dccb 46% 54%,#0000 54%) 0 0/16px 16px,
+      var(--paper-2);
+    overflow:hidden;
+  }
+  .asset .thumb img{max-width:100%; max-height:100%; display:block}
+  .asset .thumb .ph{font-family:var(--font-mono); font-size:12px; color:var(--ink-mid); text-align:center; padding:0 10px}
+  .asset .meta{padding:10px 12px; border-top:1px solid var(--line); font-family:var(--font-mono); font-size:11.5px; color:var(--ink-mid); display:flex; flex-direction:column; gap:3px}
+  .asset .meta .fn{color:var(--ink); word-break:break-all}
+  .asset .meta .dl{align-self:flex-start; margin-top:4px; color:var(--accent); text-decoration:underline; text-underline-offset:3px; cursor:pointer; font-size:11.5px}
+
+  /* 색상 */
+  .swatches{display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:12px; margin-bottom:8px}
+  .sw{
+    border:1px solid var(--line); border-radius:4px; overflow:hidden; cursor:pointer;
+    box-shadow:var(--shadow); background:var(--card);
+    opacity:0; transform:translateY(8px); animation:rise .4s ease forwards;
+  }
+  .sw .chip-color{height:62px; position:relative}
+  .sw .copied{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    background:#000a; color:#fff; font-family:var(--font-mono); font-size:12px;
+    opacity:0; transition:.15s ease;
+  }
+  .sw.flash .copied{opacity:1}
+  .sw .lbl{padding:8px 10px; font-family:var(--font-mono); font-size:12px; display:flex; justify-content:space-between; gap:8px; align-items:baseline}
+  .sw .lbl .hex{color:var(--ink); font-weight:500}
+  .sw .lbl .tag{color:var(--ink-mid); font-size:10.5px}
+  .grouplabel{font-family:var(--font-display); font-size:18px; margin:6px 0 12px}
+
+  .error{background:#fdecea; border:1px solid var(--accent); color:var(--accent); padding:14px 16px; border-radius:4px; font-size:14px; margin-top:18px}
+
+  footer{margin-top:48px; padding-top:20px; border-top:1px solid var(--line); color:var(--ink-mid); font-size:12.5px; line-height:1.7}
+  footer b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <h1>감각소</h1>
+      <span class="en">PPTX Asset Inspector</span>
+    </div>
+    <p class="tagline">PPTX 안의 폰트·이미지·색상·벡터를 꺼내서 보여 줍니다.<br>좋은 deck에서 쓰고 싶은 에셋을 바로 확인하고 가져갈 수 있으며, 파일은 브라우저 안에서만 처리되어 어디에도 전송되지 않습니다.</p>
+    <nav>
+      <a href="index.html" class="current">도구 열기</a>
+      <a href="about.html">소개</a>
+      <a href="guide.html">사용법</a>
+    </nav>
+  </header>
+
+  <div id="drop" class="drop">
+    <div class="mark">↧</div>
+    <div class="big">PPTX 파일을 여기에 끌어다 놓으세요</div>
+    <div class="small">또는 클릭해서 선택 · .pptx</div>
+    <input id="file" type="file" accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation">
+  </div>
+
+  <div id="err" class="error hidden"></div>
+
+  <div id="result" class="hidden">
+    <div class="filebar">
+      <span class="chip"><span class="dot"></span><span id="fname"></span></span>
+      <button id="reset" class="linkbtn">다른 파일 열기</button>
+    </div>
+
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-tab="fonts">폰트<span class="cnt" id="c-fonts">0</span></button>
+      <button class="tab" data-tab="images">이미지<span class="cnt" id="c-images">0</span></button>
+      <button class="tab" data-tab="colors">색상<span class="cnt" id="c-colors">0</span></button>
+      <button class="tab" data-tab="vectors">벡터<span class="cnt" id="c-vectors">0</span></button>
+    </div>
+
+    <!-- 폰트 -->
+    <div class="panel active" data-panel="fonts">
+      <p class="sec-note">각 폰트가 파일 어디에 쓰였는지 출처를 배지로 표시합니다. ‘포함됨’은 폰트 파일이 PPTX 안에 함께 들어 있다는 뜻입니다.</p>
+      <div id="fontList"></div>
+    </div>
+
+    <!-- 이미지 -->
+    <div class="panel" data-panel="images">
+      <p class="sec-note">슬라이드에 삽입된 이미지를 원본 그대로 모았습니다. 화면 크기가 아니라 파일에 저장된 원본 해상도입니다.</p>
+      <div class="toolbar"><button class="btn" id="dlImages">전체 이미지 내려받기 (zip)</button></div>
+      <div class="grid" id="imageGrid"></div>
+    </div>
+
+    <!-- 색상 -->
+    <div class="panel" data-panel="colors">
+      <p class="sec-note">색을 누르면 hex 코드가 복사됩니다. ‘테마 색’은 deck에 정의된 팔레트, ‘사용된 색’은 슬라이드에서 직접 지정된 색입니다.</p>
+      <div id="colorBody"></div>
+    </div>
+
+    <!-- 벡터 -->
+    <div class="panel" data-panel="vectors">
+      <p class="sec-note">PPTX에 포함된 벡터 파일(SVG·EMF·WMF)입니다. PowerPoint 자체 도형은 표준 벡터가 아니라 여기에 포함되지 않습니다. EMF·WMF는 브라우저에서 미리보기가 안 되어 내려받기만 제공합니다.</p>
+      <div class="grid" id="vectorGrid"></div>
+    </div>
+  </div>
+
+  <footer>
+    이 도구는 파일을 <b>읽기만</b> 하며, 모든 처리는 브라우저 안에서 이루어집니다. PPTX는 어디에도 업로드되지 않습니다.
+  </footer>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const drop = $("drop"), fileInput = $("file"), result = $("result"), errBox = $("err");
+
+let objectUrls = [];   // 미리보기/다운로드용 objectURL — reset 시 해제
+let lastFileName = ""; // zip 다운로드 이름에 쓸 원본 파일명(확장자 제외)
+
+// --- 업로드 처리 ---
+drop.addEventListener("click", () => { if (!drop.classList.contains("busy")) fileInput.click(); });
+drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("over"); });
+drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+drop.addEventListener("drop", (e) => {
+  e.preventDefault(); drop.classList.remove("over");
+  if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener("change", () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
+$("reset").addEventListener("click", resetView);
+
+// 탭 전환
+$("tabs").addEventListener("click", (e) => {
+  const t = e.target.closest(".tab"); if (!t) return;
+  const name = t.dataset.tab;
+  document.querySelectorAll(".tab").forEach(x => x.classList.toggle("active", x === t));
+  document.querySelectorAll(".panel").forEach(p => p.classList.toggle("active", p.dataset.panel === name));
+});
+
+function revokeUrls(){ objectUrls.forEach(u => URL.revokeObjectURL(u)); objectUrls = []; }
+function makeUrl(blob){ const u = URL.createObjectURL(blob); objectUrls.push(u); return u; }
+
+function resetView(){
+  revokeUrls();
+  result.classList.add("hidden"); drop.classList.remove("hidden");
+  errBox.classList.add("hidden"); fileInput.value = "";
+}
+function showError(msg){
+  errBox.textContent = msg; errBox.classList.remove("hidden");
+  drop.classList.remove("hidden"); result.classList.add("hidden");
+}
+
+async function handleFile(file){
+  errBox.classList.add("hidden");
+  if (!file.name.toLowerCase().endsWith(".pptx")){ showError("PPTX 파일만 열 수 있습니다."); return; }
+  drop.classList.add("busy");
+  drop.querySelector(".big").textContent = "분석 중…";
+  try{
+    const zip = await JSZip.loadAsync(await file.arrayBuffer());
+    if (!zip.file("ppt/presentation.xml")){ showError("올바른 PPTX 파일이 아닌 것 같습니다."); return; }
+    revokeUrls();
+    lastFileName = file.name.replace(/\.pptx$/i, "");
+    const [fonts, media, colors] = await Promise.all([
+      extractFonts(zip), extractMedia(zip), extractColors(zip)
+    ]);
+    renderAll(file.name, fonts, media, colors);
+  }catch(err){
+    showError("파일을 읽는 중 문제가 발생했습니다: " + err.message);
+  }finally{
+    drop.classList.remove("busy");
+    drop.querySelector(".big").textContent = "PPTX 파일을 여기에 끌어다 놓으세요";
+  }
+}
+
+/* ===================== 폰트 (활자소에서 이식) ===================== */
+function sourceLabel(path){
+  if (path.includes("/slides/slide")) return "슬라이드";
+  if (path.includes("/slideMasters/")) return "마스터";
+  if (path.includes("/slideLayouts/")) return "레이아웃";
+  return "기타";
+}
+async function extractFonts(zip){
+  const map = new Map();
+  const xmlPaths = Object.keys(zip.files).filter(p => p.toLowerCase().endsWith(".xml"));
+
+  const embeddedNames = new Set();
+  const presFile = zip.file("ppt/presentation.xml");
+  if (presFile){
+    const pres = await presFile.async("string");
+    if (pres.includes("embeddedFont")){
+      const m = pres.match(/<p:embeddedFontLst>[\s\S]*?<\/p:embeddedFontLst>/);
+      if (m){ for (const t of m[0].matchAll(/typeface="([^"]+)"/g)) embeddedNames.add(t[1]); }
+    }
+  }
+  const addFont = (raw, label) => {
+    const name = raw.trim();
+    if (!name || name.startsWith("+")) return;
+    if (!map.has(name)) map.set(name, { sources:new Set(), embedded:false });
+    map.get(name).sources.add(label);
+  };
+  for (const path of xmlPaths){
+    const text = await zip.file(path).async("string");
+    if (!text.includes("typeface=")) continue;
+    if (path.includes("/theme/")){
+      for (const block of text.matchAll(/<a:(majorFont|minorFont)>([\s\S]*?)<\/a:\1>/g)){
+        for (const m of block[2].matchAll(/<a:(?:latin|ea|cs)\s+typeface="([^"]*)"/g)) addFont(m[1], "테마");
+      }
+    } else {
+      const label = sourceLabel(path);
+      for (const m of text.matchAll(/typeface="([^"]*)"/g)) addFont(m[1], label);
+    }
+  }
+  for (const name of embeddedNames){ if (map.has(name)) map.get(name).embedded = true; }
+  return [...map.entries()]
+    .map(([name, v]) => ({ name, sources:[...v.sources], embedded:v.embedded }))
+    .sort((a,b) => {
+      const au = a.sources.includes("슬라이드") ? 0 : 1;
+      const bu = b.sources.includes("슬라이드") ? 0 : 1;
+      return au - bu || a.name.localeCompare(b.name);
+    });
+}
+
+/* ===================== 이미지 + 벡터 (ppt/media) ===================== */
+const RASTER = ["png","jpg","jpeg","gif","bmp","webp"];
+const VECTOR = ["svg","emf","wmf"];
+// 확장자 → MIME. SVG는 타입이 없으면 <img>에서 렌더되지 않으므로 명시가 필요하다.
+const MIME = {
+  png:"image/png", jpg:"image/jpeg", jpeg:"image/jpeg", gif:"image/gif",
+  bmp:"image/bmp", webp:"image/webp",
+  svg:"image/svg+xml", emf:"image/emf", wmf:"image/wmf"
+};
+
+// JSZip blob은 타입이 비어 있어 SVG가 안 보인다. 확장자에 맞는 MIME로 다시 감싼다.
+async function mediaBlob(zip, path, ext){
+  const raw = await zip.file(path).async("blob");
+  return MIME[ext] ? new Blob([raw], { type:MIME[ext] }) : raw;
+}
+
+async function extractMedia(zip){
+  const paths = Object.keys(zip.files)
+    .filter(p => /^ppt\/media\//i.test(p) && !zip.files[p].dir);
+  const images = [], vectors = [];
+  for (const path of paths){
+    const ext = (path.split(".").pop() || "").toLowerCase();
+    const name = path.split("/").pop();
+    if (RASTER.includes(ext)){
+      const blob = await mediaBlob(zip, path, ext);
+      const dims = await imageSize(blob).catch(() => null);
+      images.push({ name, ext, blob, size:blob.size, w:dims?.w, h:dims?.h });
+    } else if (VECTOR.includes(ext)){
+      const blob = await mediaBlob(zip, path, ext);
+      let dims = null;
+      if (ext === "svg") dims = await imageSize(blob).catch(() => null);
+      vectors.push({ name, ext, blob, size:blob.size, w:dims?.w, h:dims?.h, preview:ext === "svg" });
+    }
+  }
+  const byName = (a,b) => a.name.localeCompare(b.name, undefined, {numeric:true});
+  return { images:images.sort(byName), vectors:vectors.sort(byName) };
+}
+
+function imageSize(blob){
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => { res({ w:img.naturalWidth, h:img.naturalHeight }); URL.revokeObjectURL(url); };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error("load fail")); };
+    img.src = url;
+  });
+}
+
+/* ===================== 색상 ===================== */
+const THEME_SLOTS = [
+  ["dk1","텍스트 1"],["lt1","배경 1"],["dk2","텍스트 2"],["lt2","배경 2"],
+  ["accent1","강조 1"],["accent2","강조 2"],["accent3","강조 3"],
+  ["accent4","강조 4"],["accent5","강조 5"],["accent6","강조 6"],
+  ["hlink","하이퍼링크"],["folHlink","방문한 링크"]
+];
+function hexFromBlock(block){
+  let m = block.match(/<a:srgbClr\s+val="([0-9A-Fa-f]{6})"/);
+  if (m) return m[1].toUpperCase();
+  m = block.match(/<a:sysClr\s+[^>]*lastClr="([0-9A-Fa-f]{6})"/);
+  if (m) return m[1].toUpperCase();
+  return null;
+}
+async function extractColors(zip){
+  // 테마 색 (첫 테마의 clrScheme)
+  const theme = [];
+  const themePaths = Object.keys(zip.files).filter(p => /^ppt\/theme\/theme\d+\.xml$/i.test(p)).sort();
+  if (themePaths.length){
+    const xml = await zip.file(themePaths[0]).async("string");
+    const sch = xml.match(/<a:clrScheme[\s\S]*?<\/a:clrScheme>/);
+    if (sch){
+      for (const [slot, label] of THEME_SLOTS){
+        const b = sch[0].match(new RegExp(`<a:${slot}>([\\s\\S]*?)</a:${slot}>`));
+        if (b){ const hex = hexFromBlock(b[1]); if (hex) theme.push({ hex, label }); }
+      }
+    }
+  }
+  // 사용된 색 (슬라이드의 literal srgbClr 빈도순)
+  const counts = new Map();
+  const slidePaths = Object.keys(zip.files).filter(p => /^ppt\/slides\/slide\d+\.xml$/i.test(p));
+  for (const path of slidePaths){
+    const text = await zip.file(path).async("string");
+    for (const m of text.matchAll(/<a:srgbClr\s+val="([0-9A-Fa-f]{6})"/g)){
+      const hex = m[1].toUpperCase();
+      counts.set(hex, (counts.get(hex) || 0) + 1);
+    }
+  }
+  const used = [...counts.entries()]
+    .sort((a,b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([hex, n]) => ({ hex, n }));
+  return { theme, used };
+}
+
+/* ===================== 렌더 ===================== */
+function renderAll(name, fonts, media, colors){
+  drop.classList.add("hidden"); result.classList.remove("hidden");
+  $("fname").textContent = name;
+
+  $("c-fonts").textContent = fonts.length;
+  $("c-images").textContent = media.images.length;
+  $("c-colors").textContent = colors.theme.length + colors.used.length;
+  $("c-vectors").textContent = media.vectors.length;
+
+  renderFonts(fonts);
+  renderAssets($("imageGrid"), media.images, false);
+  renderAssets($("vectorGrid"), media.vectors, true);
+  renderColors(colors);
+
+  $("dlImages").onclick = () => downloadZip(media.images);
+  $("dlImages").style.display = media.images.length ? "" : "none";
+}
+
+function renderFonts(fonts){
+  const el = $("fontList"); el.innerHTML = "";
+  if (!fonts.length){ el.innerHTML = `<div class="empty">폰트 정보를 찾지 못했습니다.</div>`; return; }
+  fonts.forEach((f, i) => {
+    const row = document.createElement("div");
+    row.className = "font"; row.style.animationDelay = (i * 0.04) + "s";
+    const badges = f.sources.map(s => `<span class="badge">${s}</span>`).join("")
+      + (f.embedded ? `<span class="badge embed">포함됨</span>` : "");
+    row.innerHTML = `<span class="name"></span><span class="badges">${badges}</span>`;
+    row.querySelector(".name").textContent = f.name;
+    el.appendChild(row);
+  });
+}
+
+function fmtSize(bytes){
+  if (bytes < 1024) return bytes + " B";
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+  return (bytes / 1024 / 1024).toFixed(1) + " MB";
+}
+
+function renderAssets(el, items, isVector){
+  el.innerHTML = "";
+  if (!items.length){
+    el.innerHTML = `<div class="empty">${isVector ? "벡터 파일이 없습니다." : "이미지가 없습니다."}</div>`;
+    return;
+  }
+  items.forEach((it, i) => {
+    const card = document.createElement("div");
+    card.className = "asset"; card.style.animationDelay = (i * 0.03) + "s";
+
+    const thumb = document.createElement("div");
+    thumb.className = "thumb";
+    const canPreview = !isVector || it.preview;
+    if (canPreview){
+      const img = document.createElement("img");
+      img.src = makeUrl(it.blob); img.alt = it.name; img.loading = "lazy";
+      thumb.appendChild(img);
+    } else {
+      const ph = document.createElement("div");
+      ph.className = "ph"; ph.textContent = it.ext.toUpperCase() + "\n미리보기 불가";
+      ph.style.whiteSpace = "pre-line";
+      thumb.appendChild(ph);
+    }
+
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    const dim = (it.w && it.h) ? `${it.w}×${it.h}px · ` : "";
+    meta.innerHTML = `<span class="fn"></span><span>${it.ext.toUpperCase()} · ${dim}${fmtSize(it.size)}</span><span class="dl">내려받기</span>`;
+    meta.querySelector(".fn").textContent = it.name;
+    meta.querySelector(".dl").onclick = () => downloadOne(it.blob, it.name);
+
+    card.appendChild(thumb); card.appendChild(meta);
+    el.appendChild(card);
+  });
+}
+
+function renderColors(colors){
+  const body = $("colorBody"); body.innerHTML = "";
+  if (!colors.theme.length && !colors.used.length){
+    body.innerHTML = `<div class="empty">색상 정보를 찾지 못했습니다.</div>`; return;
+  }
+  if (colors.theme.length){
+    body.appendChild(groupLabel("테마 색"));
+    body.appendChild(swatchGrid(colors.theme.map(c => ({ hex:c.hex, tag:c.label }))));
+  }
+  if (colors.used.length){
+    body.appendChild(groupLabel("사용된 색"));
+    body.appendChild(swatchGrid(colors.used.map(c => ({ hex:c.hex, tag:c.n + "회" }))));
+  }
+}
+function groupLabel(text){
+  const d = document.createElement("div"); d.className = "grouplabel"; d.textContent = text; return d;
+}
+function swatchGrid(list){
+  const grid = document.createElement("div"); grid.className = "swatches";
+  list.forEach((c, i) => {
+    const sw = document.createElement("div");
+    sw.className = "sw"; sw.style.animationDelay = (i * 0.02) + "s";
+    sw.innerHTML = `<div class="chip-color" style="background:#${c.hex}"><div class="copied">복사됨</div></div>`
+      + `<div class="lbl"><span class="hex">#${c.hex}</span><span class="tag">${c.tag}</span></div>`;
+    sw.onclick = () => copyHex("#" + c.hex, sw);
+    grid.appendChild(sw);
+  });
+  return grid;
+}
+function copyHex(hex, el){
+  const flash = () => { el.classList.add("flash"); setTimeout(() => el.classList.remove("flash"), 700); };
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(hex).then(flash).catch(flash);
+  } else { flash(); }
+}
+
+/* ===================== 다운로드 ===================== */
+function downloadBlob(blob, filename){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+function downloadOne(blob, name){ downloadBlob(blob, name); }
+async function downloadZip(images){
+  if (!images.length) return;
+  const zip = new JSZip();
+  images.forEach(it => zip.file(it.name, it.blob));
+  const blob = await zip.generateAsync({ type:"blob" });
+  downloadBlob(blob, (lastFileName || "images") + "-images.zip");
+}
+</script>
+</body>
+</html>

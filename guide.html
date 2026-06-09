@@ -1,0 +1,221 @@
+<!doctype html>
+<!-- 감각소 사용법 안내 페이지 -->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>감각소 사용법 — PPTX 에셋 추출 도구</title>
+<meta name="description" content="감각소 사용법을 안내합니다. PPTX 파일을 올리고 폰트·이미지·색상·벡터를 꺼내는 방법을 단계별로 설명합니다.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f3efe6; --paper-2:#ece5d6; --card:#faf7f0;
+    --ink:#1c1a17; --ink-mid:#6b6457; --line:#d9d1be; --accent:#c0432a;
+    --shadow:0 1px 0 #fff8 inset, 0 14px 30px -18px #5a4a2a55;
+    --font-display:'Gowun Batang', serif;
+    --font-sans:'IBM Plex Sans KR', system-ui, sans-serif;
+    --font-mono:'IBM Plex Mono', ui-monospace, monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:var(--font-sans); color:var(--ink); background:var(--paper);
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='3' height='3'%3E%3Crect width='3' height='3' fill='%23f3efe6'/%3E%3Ccircle cx='1' cy='1' r='.4' fill='%23d9d1be' opacity='.4'/%3E%3C/svg%3E");
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:920px; margin:0 auto; padding:48px 22px 80px}
+
+  /* 헤더 */
+  header{border-bottom:1.5px solid var(--ink); padding-bottom:20px; margin-bottom:34px}
+  .brand{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap}
+  .brand a{text-decoration:none; color:inherit}
+  .brand h1{
+    font-family:var(--font-display); font-weight:700; font-size:clamp(40px,8vw,68px);
+    letter-spacing:.01em; margin:0; line-height:.95;
+  }
+  .brand .en{font-family:var(--font-mono); font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent)}
+
+  /* 내비 */
+  nav{margin-top:16px; display:flex; gap:20px; flex-wrap:wrap}
+  nav a{font-family:var(--font-sans); font-size:14px; font-weight:500; color:var(--ink-mid); text-decoration:none}
+  nav a:hover{color:var(--accent)}
+  nav a.current{color:var(--ink); border-bottom:1.5px solid var(--ink); padding-bottom:2px}
+
+  /* 본문 */
+  .page-title{
+    font-family:var(--font-display); font-size:clamp(28px,5vw,44px);
+    font-weight:700; margin:0 0 14px; line-height:1.1;
+  }
+  .lead{font-family:var(--font-sans); font-size:15px; font-weight:300; color:var(--ink-mid); margin:0 0 48px; line-height:1.75}
+
+  /* 스텝 */
+  .steps{margin-bottom:52px}
+  .step{
+    display:grid; grid-template-columns:48px 1fr; gap:0 20px;
+    margin-bottom:10px;
+  }
+  .step-num{
+    font-family:var(--font-mono); font-size:13px; color:var(--accent);
+    font-weight:500; letter-spacing:.04em;
+    padding-top:18px;
+  }
+  .step-body{
+    background:var(--card); border:1px solid var(--line); border-radius:4px;
+    padding:20px 22px; box-shadow:var(--shadow);
+  }
+  .step-body h3{font-family:var(--font-sans); font-size:15px; font-weight:600; margin:0 0 8px}
+  .step-body p{font-family:var(--font-sans); font-size:14px; font-weight:400; color:var(--ink-mid); margin:0; line-height:1.75}
+  .step-body code{
+    font-family:var(--font-mono); font-size:12.5px; background:var(--paper-2);
+    padding:2px 6px; border-radius:3px; color:var(--ink);
+  }
+
+  /* 탭 설명 */
+  .section{margin-bottom:52px}
+  .section h2{
+    font-family:var(--font-display); font-size:24px; font-weight:700;
+    margin:0 0 18px; padding-bottom:10px; border-bottom:1px solid var(--line);
+  }
+  .tab-list{display:flex; flex-direction:column; gap:10px}
+  .tab-item{
+    background:var(--card); border:1px solid var(--line); border-radius:4px;
+    padding:16px 20px; box-shadow:var(--shadow);
+    display:grid; grid-template-columns:80px 1fr; gap:12px; align-items:start;
+  }
+  .tab-name{
+    font-family:var(--font-mono); font-size:13px; font-weight:500;
+    color:var(--accent); padding-top:2px;
+  }
+  .tab-desc h4{font-family:var(--font-sans); font-size:15px; font-weight:600; margin:0 0 6px}
+  .tab-desc p{font-family:var(--font-sans); font-size:14px; font-weight:400; color:var(--ink-mid); margin:0; line-height:1.75}
+
+  /* 주의사항 */
+  .note-box{
+    background:var(--card); border:1px solid var(--line); border-radius:4px;
+    padding:20px 22px; box-shadow:var(--shadow); margin-bottom:52px;
+  }
+  .note-box .label{font-family:var(--font-mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-mid); margin-bottom:10px}
+  .note-list{list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px}
+  .note-list li{font-family:var(--font-sans); font-size:14px; font-weight:400; color:var(--ink-mid); padding-left:16px; position:relative; line-height:1.75}
+  .note-list li::before{content:"—"; position:absolute; left:0; color:var(--line)}
+
+  /* CTA */
+  .cta-wrap{text-align:center; padding:48px 0}
+  .cta-wrap p{font-size:15px; color:var(--ink-mid); margin:0 0 20px}
+  .btn{
+    display:inline-block; font-family:var(--font-sans); font-size:15px; font-weight:600;
+    background:var(--ink); color:var(--paper); text-decoration:none;
+    padding:13px 28px; border-radius:3px; transition:.15s ease;
+    letter-spacing:.01em;
+  }
+  .btn:hover{background:var(--accent)}
+
+  footer{margin-top:48px; padding-top:20px; border-top:1px solid var(--line); color:var(--ink-mid); font-size:12.5px; line-height:1.7}
+  footer a{color:var(--ink-mid); text-decoration:none}
+  footer a:hover{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <a href="index.html">
+        <h1>감각소</h1>
+      </a>
+      <span class="en">PPTX Asset Inspector</span>
+    </div>
+    <nav>
+      <a href="index.html">도구 열기</a>
+      <a href="about.html">소개</a>
+      <a href="guide.html" class="current">사용법</a>
+    </nav>
+  </header>
+
+  <h1 class="page-title">사용법</h1>
+  <p class="lead">세 단계로 끝납니다.<br>설치는 필요 없습니다.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-body">
+        <h3>PPTX 파일을 올립니다</h3>
+        <p>파일을 드롭존에 끌어다 놓거나, 드롭존을 클릭해서 파일을 선택합니다. <code>.pptx</code> 형식만 지원합니다. 파일 크기 제한은 없으며, 브라우저 메모리가 허용하는 한 처리됩니다.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-body">
+        <h3>탭을 선택해서 에셋을 확인합니다</h3>
+        <p>파일이 로드되면 폰트·이미지·색상·벡터 탭이 나타납니다. 각 탭의 숫자는 추출된 항목 수입니다. 탭을 눌러 원하는 에셋을 확인합니다.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-body">
+        <h3>필요한 에셋을 가져갑니다</h3>
+        <p>이미지는 개별 내려받기 또는 ZIP 일괄 다운로드가 가능합니다. 색상은 클릭하면 HEX 코드가 클립보드에 복사됩니다. 다른 파일을 보려면 상단의 "다른 파일 열기"를 누릅니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>탭별 기능 설명</h2>
+    <div class="tab-list">
+      <div class="tab-item">
+        <div class="tab-name">폰트</div>
+        <div class="tab-desc">
+          <h4>사용된 폰트 목록</h4>
+          <p>슬라이드 XML에서 폰트 이름을 모두 추출해 나열합니다. 파일 안에 직접 포함된 폰트는 "포함됨" 배지로 표시됩니다. 포함된 폰트는 PPT를 열지 않아도 이름을 확인할 수 있습니다.</p>
+        </div>
+      </div>
+      <div class="tab-item">
+        <div class="tab-name">이미지</div>
+        <div class="tab-desc">
+          <h4>래스터 이미지 추출</h4>
+          <p>PNG·JPG·GIF·BMP·WEBP 파일을 미리보기와 함께 보여 줍니다. 파일명·해상도·용량이 표시되며, 이미지별 내려받기와 전체 ZIP 다운로드를 지원합니다.</p>
+        </div>
+      </div>
+      <div class="tab-item">
+        <div class="tab-name">색상</div>
+        <div class="tab-desc">
+          <h4>테마 색 + 사용된 색</h4>
+          <p>테마의 공식 팔레트(dk1, lt1, accent1 … 등 12개 슬롯)와 슬라이드에서 실제로 쓰인 색상을 사용 빈도 순으로 나눠 보여 줍니다. 색상 칩을 클릭하면 HEX 코드가 복사됩니다.</p>
+        </div>
+      </div>
+      <div class="tab-item">
+        <div class="tab-name">벡터</div>
+        <div class="tab-desc">
+          <h4>SVG / EMF / WMF 파일</h4>
+          <p>SVG는 브라우저에서 바로 미리보기가 가능합니다. EMF·WMF는 브라우저 렌더가 되지 않아 미리보기 없이 파일 다운로드만 제공됩니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note-box">
+    <div class="label">참고 사항</div>
+    <ul class="note-list">
+      <li>PPT 자체 도형(텍스트 박스, 도형 등)은 추출되지 않습니다. <code>ppt/media/</code> 폴더에 있는 파일만 대상입니다.</li>
+      <li>오디오·비디오 파일은 지원하지 않습니다.</li>
+      <li>파일이 크거나 슬라이드 수가 많으면 처리에 수 초가 걸릴 수 있습니다.</li>
+      <li>파일은 브라우저 안에서만 처리됩니다. 서버로 전송되지 않습니다.</li>
+    </ul>
+  </div>
+
+  <div class="cta-wrap">
+    <p>준비가 됐다면 바로 시작해 보세요.</p>
+    <a href="index.html" class="btn">감각소 열기</a>
+  </div>
+
+  <footer>
+    <a href="index.html">감각소</a> &nbsp;·&nbsp;
+    <a href="about.html">소개</a> &nbsp;·&nbsp;
+    <a href="guide.html">사용법</a>
+  </footer>
+
+</div>
+</body>
+</html>

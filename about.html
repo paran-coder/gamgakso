@@ -1,0 +1,162 @@
+<!doctype html>
+<!-- 감각소 서비스 소개 페이지 -->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>감각소 소개 — PPTX 에셋 추출 도구</title>
+<meta name="description" content="감각소는 PPT 파일 안의 폰트·이미지·색상·벡터를 브라우저에서 바로 꺼내 주는 무료 도구입니다. 파일은 어디에도 전송되지 않습니다.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f3efe6; --paper-2:#ece5d6; --card:#faf7f0;
+    --ink:#1c1a17; --ink-mid:#6b6457; --line:#d9d1be; --accent:#c0432a;
+    --shadow:0 1px 0 #fff8 inset, 0 14px 30px -18px #5a4a2a55;
+    --font-display:'Gowun Batang', serif;
+    --font-sans:'IBM Plex Sans KR', system-ui, sans-serif;
+    --font-mono:'IBM Plex Mono', ui-monospace, monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:var(--font-sans); color:var(--ink); background:var(--paper);
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='3' height='3'%3E%3Crect width='3' height='3' fill='%23f3efe6'/%3E%3Ccircle cx='1' cy='1' r='.4' fill='%23d9d1be' opacity='.4'/%3E%3C/svg%3E");
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:920px; margin:0 auto; padding:48px 22px 80px}
+
+  /* 헤더 */
+  header{border-bottom:1.5px solid var(--ink); padding-bottom:20px; margin-bottom:34px}
+  .brand{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap}
+  .brand a{text-decoration:none; color:inherit}
+  .brand h1{
+    font-family:var(--font-display); font-weight:700; font-size:clamp(40px,8vw,68px);
+    letter-spacing:.01em; margin:0; line-height:.95;
+  }
+  .brand .en{font-family:var(--font-mono); font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent)}
+
+  /* 내비 */
+  nav{margin-top:16px; display:flex; gap:20px; flex-wrap:wrap}
+  nav a{font-family:var(--font-sans); font-size:14px; font-weight:500; color:var(--ink-mid); text-decoration:none}
+  nav a:hover{color:var(--accent)}
+  nav a.current{color:var(--ink); border-bottom:1.5px solid var(--ink); padding-bottom:2px}
+
+  /* 본문 */
+  .page-title{
+    font-family:var(--font-display); font-size:clamp(28px,5vw,44px);
+    font-weight:700; margin:0 0 14px; line-height:1.1;
+  }
+  .lead{font-family:var(--font-sans); font-size:15px; font-weight:300; color:var(--ink-mid); margin:0 0 48px; line-height:1.75}
+
+  /* 기능 카드 그리드 */
+  .features{display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; margin-bottom:52px}
+  .feat{
+    background:var(--card); border:1px solid var(--line); border-radius:4px;
+    padding:22px 20px; box-shadow:var(--shadow);
+  }
+  .feat .icon{font-family:var(--font-display); font-size:32px; color:var(--accent); margin-bottom:14px; line-height:1}
+  .feat h3{font-family:var(--font-sans); font-size:15px; font-weight:600; margin:0 0 8px}
+  .feat p{font-family:var(--font-sans); font-size:14px; font-weight:400; color:var(--ink-mid); margin:0; line-height:1.7}
+
+  /* 섹션 */
+  .section{margin-bottom:52px}
+  .section h2{
+    font-family:var(--font-display); font-size:24px; font-weight:700;
+    margin:0 0 18px; padding-bottom:10px; border-bottom:1px solid var(--line);
+  }
+  .section p{font-family:var(--font-sans); font-size:15px; font-weight:400; color:var(--ink-mid); line-height:1.75; margin:0 0 14px}
+
+  /* 프라이버시 강조 박스 */
+  .privacy-box{
+    background:var(--card); border:1.5px solid var(--ink); border-radius:4px;
+    padding:22px 24px; box-shadow:var(--shadow); margin-bottom:52px;
+  }
+  .privacy-box .label{font-family:var(--font-mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin-bottom:8px}
+  .privacy-box p{font-family:var(--font-sans); font-size:15px; font-weight:400; margin:0; line-height:1.75}
+
+  /* CTA */
+  .cta-wrap{text-align:center; padding:48px 0}
+  .cta-wrap p{font-size:15px; color:var(--ink-mid); margin:0 0 20px}
+  .btn{
+    display:inline-block; font-family:var(--font-sans); font-size:15px; font-weight:600;
+    background:var(--ink); color:var(--paper); text-decoration:none;
+    padding:13px 28px; border-radius:3px; transition:.15s ease;
+    letter-spacing:.01em;
+  }
+  .btn:hover{background:var(--accent)}
+
+  footer{margin-top:48px; padding-top:20px; border-top:1px solid var(--line); color:var(--ink-mid); font-size:12.5px; line-height:1.7}
+  footer a{color:var(--ink-mid); text-decoration:none}
+  footer a:hover{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <a href="index.html">
+        <h1>감각소</h1>
+      </a>
+      <span class="en">PPTX Asset Inspector</span>
+    </div>
+    <nav>
+      <a href="index.html">도구 열기</a>
+      <a href="about.html" class="current">소개</a>
+      <a href="guide.html">사용법</a>
+    </nav>
+  </header>
+
+  <h1 class="page-title">PPT 안의 에셋을<br>바로 꺼냅니다.</h1>
+  <p class="lead">좋은 프레젠테이션을 보다가 "이 폰트가 뭔지, 이 색상 코드가 뭔지" 궁금했던 적 있으신가요.<br>감각소는 PPTX 파일 하나를 올리면 안에 담긴 디자인 에셋을 폰트·이미지·색상·벡터로 나눠서 한눈에 보여 줍니다.</p>
+
+  <div class="features">
+    <div class="feat">
+      <div class="icon">Aa</div>
+      <h3>폰트</h3>
+      <p>슬라이드에 쓰인 폰트 이름을 모두 추출합니다. 파일에 포함된 폰트는 따로 표시됩니다.</p>
+    </div>
+    <div class="feat">
+      <div class="icon">⬜</div>
+      <h3>이미지</h3>
+      <p>PNG·JPG·GIF 등 래스터 이미지를 미리보기와 함께 꺼내고, 한 번에 ZIP으로 내려받을 수 있습니다.</p>
+    </div>
+    <div class="feat">
+      <div class="icon">●</div>
+      <h3>색상</h3>
+      <p>테마 팔레트와 슬라이드에서 실제로 사용된 색상을 빈도순으로 보여 줍니다. 클릭하면 HEX 코드가 복사됩니다.</p>
+    </div>
+    <div class="feat">
+      <div class="icon">◇</div>
+      <h3>벡터</h3>
+      <p>SVG·EMF·WMF 벡터 파일을 찾아냅니다. SVG는 바로 미리보기, 나머지는 개별 다운로드가 가능합니다.</p>
+    </div>
+  </div>
+
+  <div class="privacy-box">
+    <div class="label">프라이버시</div>
+    <p>업로드한 파일은 <strong>브라우저 안에서만 처리됩니다.</strong> 서버로 전송되거나 저장되지 않습니다. 민감한 내용이 담긴 사내 프레젠테이션도 안심하고 사용할 수 있습니다.</p>
+  </div>
+
+  <div class="section">
+    <h2>이런 분들께 유용합니다</h2>
+    <p>디자이너나 기획자가 레퍼런스 PPT를 분석할 때, 오래된 파일에서 사용된 폰트를 확인할 때, 브랜드 가이드의 색상 코드를 빠르게 뽑아낼 때 감각소가 시간을 아껴 줍니다.</p>
+    <p>별도 설치 없이 브라우저에서 바로 사용하며, 완전 무료입니다.</p>
+  </div>
+
+  <div class="cta-wrap">
+    <p>PPTX 파일을 끌어다 놓는 것만으로 시작됩니다.</p>
+    <a href="index.html" class="btn">감각소 열기</a>
+  </div>
+
+  <footer>
+    <a href="index.html">감각소</a> &nbsp;·&nbsp;
+    <a href="about.html">소개</a> &nbsp;·&nbsp;
+    <a href="guide.html">사용법</a>
+  </footer>
+
+</div>
+</body>
+</html>

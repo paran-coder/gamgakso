@@ -22,6 +22,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1548937774076515" crossorigin="anonymous"></script>
 <style>
   :root{
     --paper:#f3efe6; --paper-2:#ece5d6; --card:#faf7f0;
@@ -66,17 +67,14 @@
   /* 스텝 */
   .steps{margin-bottom:52px}
   .step{
-    display:grid; grid-template-columns:48px 1fr; gap:0 20px;
+    background:var(--card); border:1px solid var(--line); border-radius:4px;
+    padding:16px 20px; box-shadow:var(--shadow);
+    display:grid; grid-template-columns:48px 1fr; gap:12px; align-items:start;
     margin-bottom:10px;
   }
   .step-num{
-    font-family:var(--font-mono); font-size:13px; color:var(--accent);
-    font-weight:500; letter-spacing:.04em;
-    padding-top:18px;
-  }
-  .step-body{
-    background:var(--card); border:1px solid var(--line); border-radius:4px;
-    padding:20px 22px; box-shadow:var(--shadow);
+    font-family:var(--font-mono); font-size:13px; font-weight:500;
+    color:var(--accent); padding-top:2px;
   }
   .step-body h3{font-family:var(--font-sans); font-size:15px; font-weight:600; margin:0 0 8px}
   .step-body p{font-family:var(--font-sans); font-size:14px; font-weight:400; color:var(--ink-mid); margin:0; line-height:1.75}

@@ -5,25 +5,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>감각소 — PPTX 에셋 추출</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='6' fill='%23f3efe6'/><text x='32' y='50' font-family='serif' font-size='44' font-weight='700' text-anchor='middle' fill='%23c0432a'>감</text></svg>">
-<meta name="description" content="PPT 안의 폰트·이미지·색상·벡터를 브라우저에서 바로 꺼내 주는 무료 도구입니다. 파일은 어디에도 전송되지 않습니다.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://www.gamgakso.com/">
-<meta property="og:title" content="감각소 — PPTX 에셋 추출 도구">
-<meta property="og:description" content="PPT 안의 폰트·이미지·색상·벡터를 바로 꺼냅니다. 파일은 브라우저 안에서만 처리됩니다.">
-<meta property="og:image" content="https://www.gamgakso.com/og-image.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:locale" content="ko_KR">
-<meta property="og:site_name" content="감각소">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="감각소 — PPTX 에셋 추출 도구">
-<meta name="twitter:description" content="PPT 안의 폰트·이미지·색상·벡터를 바로 꺼냅니다.">
-<meta name="twitter:image" content="https://www.gamgakso.com/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1548937774076515" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
   :root{
@@ -43,16 +27,16 @@
   }
   .wrap{max-width:920px; margin:0 auto; padding:48px 22px 80px}
 
-  header{border-bottom:1.5px solid var(--ink); padding-bottom:20px; margin-bottom:34px}
+  header{border-bottom:1.5px solid var(--ink); padding-bottom:18px; margin-bottom:34px}
   .brand{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap}
   .brand h1{
     font-family:var(--font-display); font-weight:700; font-size:clamp(40px,8vw,68px);
     letter-spacing:.01em; margin:0; line-height:.95;
   }
   .brand .en{font-family:var(--font-mono); font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent)}
-  .tagline{margin:16px 0 0; color:var(--ink-mid); font-family:var(--font-sans); font-weight:300; font-size:14px; line-height:1.75}
+  .tagline{margin:10px 0 0; color:var(--ink-mid); font-weight:300; font-size:15px; max-width:62ch}
 
-  nav{margin-top:16px; display:flex; gap:20px; flex-wrap:wrap}
+  nav{margin-top:36px; display:flex; gap:20px; flex-wrap:wrap}
   nav a{font-family:var(--font-sans); font-size:14px; font-weight:500; color:var(--ink-mid); text-decoration:none}
   nav a:hover{color:var(--accent)}
   nav a.current{color:var(--ink); border-bottom:1.5px solid var(--ink); padding-bottom:2px}
@@ -171,12 +155,12 @@
       <h1>감각소</h1>
       <span class="en">PPTX Asset Inspector</span>
     </div>
-    <p class="tagline">PPTX 안의 폰트·이미지·색상·벡터를 꺼내서 보여 줍니다.<br>좋은 deck에서 쓰고 싶은 에셋을 바로 확인하고 가져갈 수 있으며, 파일은 브라우저 안에서만 처리되어 어디에도 전송되지 않습니다.</p>
     <nav>
       <a href="index.html" class="current">도구 열기</a>
       <a href="about.html">소개</a>
       <a href="guide.html">사용법</a>
     </nav>
+    <p class="tagline">PPTX 안의 폰트·이미지·색상·벡터를 꺼내서 보여 줍니다.<br>좋은 deck에서 쓰고 싶은 에셋을 바로 확인하고 가져갈 수 있으며,<br>파일은 브라우저 안에서만 처리되어 어디에도 전송되지 않습니다.</p>
   </header>
 
   <div id="drop" class="drop">
@@ -223,6 +207,7 @@
     <!-- 벡터 -->
     <div class="panel" data-panel="vectors">
       <p class="sec-note">PPTX에 포함된 벡터 파일(SVG·EMF·WMF)입니다. PowerPoint 자체 도형은 표준 벡터가 아니라 여기에 포함되지 않습니다. EMF·WMF는 브라우저에서 미리보기가 안 되어 내려받기만 제공합니다.</p>
+      <div class="toolbar"><button class="btn" id="dlVectors">전체 벡터 내려받기 (zip)</button></div>
       <div class="grid" id="vectorGrid"></div>
     </div>
   </div>
@@ -448,8 +433,10 @@ function renderAll(name, fonts, media, colors){
   renderAssets($("vectorGrid"), media.vectors, true);
   renderColors(colors);
 
-  $("dlImages").onclick = () => downloadZip(media.images);
+  $("dlImages").onclick = () => downloadZip(media.images, "images");
   $("dlImages").style.display = media.images.length ? "" : "none";
+  $("dlVectors").onclick = () => downloadZip(media.vectors, "vectors");
+  $("dlVectors").style.display = media.vectors.length ? "" : "none";
 }
 
 function renderFonts(fonts){
@@ -553,12 +540,12 @@ function downloadBlob(blob, filename){
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 function downloadOne(blob, name){ downloadBlob(blob, name); }
-async function downloadZip(images){
-  if (!images.length) return;
+async function downloadZip(items, suffix){
+  if (!items.length) return;
   const zip = new JSZip();
-  images.forEach(it => zip.file(it.name, it.blob));
+  items.forEach(it => zip.file(it.name, it.blob));
   const blob = await zip.generateAsync({ type:"blob" });
-  downloadBlob(blob, (lastFileName || "images") + "-images.zip");
+  downloadBlob(blob, (lastFileName || suffix) + "-" + suffix + ".zip");
 }
 </script>
 </body>

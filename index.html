@@ -389,11 +389,8 @@ async function extractFonts(zip){
   for (const name of embeddedNames){ if (map.has(name)) map.get(name).embedded = true; }
   return [...map.entries()]
     .map(([name, v]) => ({ name, sources:[...v.sources], embedded:v.embedded }))
-    .sort((a,b) => {
-      const au = a.sources.includes("슬라이드") ? 0 : 1;
-      const bu = b.sources.includes("슬라이드") ? 0 : 1;
-      return au - bu || a.name.localeCompare(b.name);
-    });
+    .filter(f => f.sources.includes("슬라이드"))
+    .sort((a,b) => a.name.localeCompare(b.name));
 }
 
 /* ===================== 이미지 + 벡터 (ppt/media) ===================== */
@@ -476,22 +473,12 @@ async function extractColors(zip){
   const counts = new Map();
   const slidePaths = Object.keys(zip.files).filter(p => /^ppt\/slides\/slide\d+\.xml$/i.test(p));
 
-  // 테마 색 맵 — schemeClr → 실제 hex 변환에 사용
-  const themeHexMap = new Map();
-  for (const c of theme) themeHexMap.set(c.slot, c.hex);
-
   for (const path of slidePaths){
     const text = await zip.file(path).async("string");
-    // 직접 지정된 색
+    // 직접 지정된 색만 추출
     for (const m of text.matchAll(/<a:srgbClr\s+val="([0-9A-Fa-f]{6})"/g)){
       const hex = m[1].toUpperCase();
       counts.set(hex, (counts.get(hex) || 0) + 1);
-    }
-    // 테마 기반 색 (schemeClr → 실제 hex로 변환)
-    for (const m of text.matchAll(/<a:schemeClr\s+val="([^"]+)"/g)){
-      const slot = m[1];
-      const hex = themeHexMap.get(slot);
-      if (hex) counts.set(hex, (counts.get(hex) || 0) + 1);
     }
   }
   const used = [...counts.entries()]

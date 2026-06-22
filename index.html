@@ -165,6 +165,22 @@
 
   footer{margin-top:48px; padding-top:20px; border-top:1px solid var(--line); color:var(--ink-mid); font-size:12.5px; line-height:1.7}
   footer b{color:var(--ink)}
+
+  /* 랜딩 콘텐츠 섹션 */
+  .landing{margin-top:72px; border-top:1px solid var(--line); padding-top:52px}
+  .landing-section{margin-bottom:52px}
+  .landing-section h2{
+    font-family:var(--font-display); font-size:22px; font-weight:700;
+    margin:0 0 18px; padding-bottom:10px; border-bottom:1px solid var(--line);
+  }
+  .landing-section p{
+    font-family:var(--font-sans); font-size:15px; font-weight:400;
+    color:var(--ink-mid); line-height:1.75; margin:0 0 14px;
+  }
+  .landing-section p:last-child{margin-bottom:0}
+  .landing-faq{display:flex; flex-direction:column; gap:20px; margin-top:4px}
+  .landing-faq dt{font-family:var(--font-sans); font-size:15px; font-weight:600; color:var(--ink); margin:0 0 4px}
+  .landing-faq dd{font-family:var(--font-sans); font-size:14px; color:var(--ink-mid); line-height:1.75; margin:0}
 </style>
 </head>
 <body>
@@ -219,7 +235,7 @@
 
     <!-- 색상 -->
     <div class="panel" data-panel="colors">
-      <p class="sec-note">색을 누르면 hex 코드가 복사됩니다. ‘테마 색’은 deck에 정의된 팔레트, ‘사용된 색’은 슬라이드에서 직접 지정된 색입니다.</p>
+      <p class="sec-note">슬라이드에서 실제로 사용된 색상을 빈도순으로 보여 줍니다. 색을 누르면 HEX 코드가 복사됩니다.</p>
       <div id="colorBody"></div>
     </div>
 
@@ -228,6 +244,42 @@
       <p class="sec-note">PPTX에 포함된 벡터 파일(SVG·EMF·WMF)입니다. PowerPoint 자체 도형은 표준 벡터가 아니라 여기에 포함되지 않습니다. EMF·WMF는 브라우저에서 미리보기가 안 되어 내려받기만 제공합니다.</p>
       <div class="grid" id="vectorGrid"></div>
     </div>
+  </div>
+
+  <div class="landing">
+
+    <div class="landing-section">
+      <h2>감각소를 만든 이유</h2>
+      <p>좋은 프레젠테이션을 받았을 때 가장 먼저 드는 생각은 "이 폰트가 뭔지, 이 색상 코드가 뭔지"입니다. PPT를 직접 열어 텍스트를 클릭하고, 폰트 메뉴를 확인하고, 색상 피커를 열어 HEX 코드를 기록하는 과정이 번거롭게 느껴졌습니다.</p>
+      <p>감각소는 그 과정을 없애기 위해 만들었습니다. 파일을 한 번 올리면 폰트·이미지·색상·벡터를 한 화면에서 확인하고 바로 가져갈 수 있습니다. 설치도 없고, 회원가입도 없고, 비용도 없습니다. 파일은 브라우저 안에서만 처리되어 어디에도 전송되지 않습니다.</p>
+    </div>
+
+    <div class="landing-section">
+      <h2>자주 묻는 질문</h2>
+      <dl class="landing-faq">
+        <div>
+          <dt>파일이 외부로 전송되나요?</dt>
+          <dd>아니요. 감각소는 JavaScript로 브라우저 안에서만 파일을 처리합니다. 어떤 서버에도 전송되거나 저장되지 않습니다. 사내 기밀 자료도 안심하고 사용할 수 있습니다.</dd>
+        </div>
+        <div>
+          <dt>어떤 파일 형식을 지원하나요?</dt>
+          <dd>.pptx 형식만 지원합니다. .ppt(구버전 파워포인트) 형식은 지원하지 않습니다. 구버전 파일은 파워포인트에서 .pptx로 다시 저장한 후 사용해 주세요.</dd>
+        </div>
+        <div>
+          <dt>파일 크기 제한이 있나요?</dt>
+          <dd>별도 제한은 없습니다. 파일이 클수록 처리 시간이 길어질 수 있으며, 브라우저 메모리가 허용하는 한 처리됩니다.</dd>
+        </div>
+        <div>
+          <dt>추출한 이미지의 저작권은 누구에게 있나요?</dt>
+          <dd>감각소는 파일에서 에셋을 꺼내는 도구입니다. 추출한 이미지나 폰트의 저작권은 원본 제작자 또는 권리자에게 있으므로, 사용 전 라이선스를 확인하시기 바랍니다.</dd>
+        </div>
+        <div>
+          <dt>무료인가요?</dt>
+          <dd>네, 완전히 무료입니다. 회원가입이나 결제 없이 모든 기능을 사용할 수 있습니다.</dd>
+        </div>
+      </dl>
+    </div>
+
   </div>
 
   <footer>
@@ -416,18 +468,30 @@ async function extractColors(zip){
     if (sch){
       for (const [slot, label] of THEME_SLOTS){
         const b = sch[0].match(new RegExp(`<a:${slot}>([\\s\\S]*?)</a:${slot}>`));
-        if (b){ const hex = hexFromBlock(b[1]); if (hex) theme.push({ hex, label }); }
+        if (b){ const hex = hexFromBlock(b[1]); if (hex) theme.push({ hex, label, slot }); }
       }
     }
   }
   // 사용된 색 (슬라이드의 literal srgbClr 빈도순)
   const counts = new Map();
   const slidePaths = Object.keys(zip.files).filter(p => /^ppt\/slides\/slide\d+\.xml$/i.test(p));
+
+  // 테마 색 맵 — schemeClr → 실제 hex 변환에 사용
+  const themeHexMap = new Map();
+  for (const c of theme) themeHexMap.set(c.slot, c.hex);
+
   for (const path of slidePaths){
     const text = await zip.file(path).async("string");
+    // 직접 지정된 색
     for (const m of text.matchAll(/<a:srgbClr\s+val="([0-9A-Fa-f]{6})"/g)){
       const hex = m[1].toUpperCase();
       counts.set(hex, (counts.get(hex) || 0) + 1);
+    }
+    // 테마 기반 색 (schemeClr → 실제 hex로 변환)
+    for (const m of text.matchAll(/<a:schemeClr\s+val="([^"]+)"/g)){
+      const slot = m[1];
+      const hex = themeHexMap.get(slot);
+      if (hex) counts.set(hex, (counts.get(hex) || 0) + 1);
     }
   }
   const used = [...counts.entries()]
@@ -443,7 +507,7 @@ function renderAll(name, fonts, media, colors){
 
   $("c-fonts").textContent = fonts.length;
   $("c-images").textContent = media.images.length;
-  $("c-colors").textContent = colors.theme.length + colors.used.length;
+  $("c-colors").textContent = colors.used.length;
   $("c-vectors").textContent = media.vectors.length;
 
   renderFonts(fonts);
@@ -513,17 +577,10 @@ function renderAssets(el, items, isVector){
 
 function renderColors(colors){
   const body = $("colorBody"); body.innerHTML = "";
-  if (!colors.theme.length && !colors.used.length){
+  if (!colors.used.length){
     body.innerHTML = `<div class="empty">색상 정보를 찾지 못했습니다.</div>`; return;
   }
-  if (colors.theme.length){
-    body.appendChild(groupLabel("테마 색"));
-    body.appendChild(swatchGrid(colors.theme.map(c => ({ hex:c.hex, tag:c.label }))));
-  }
-  if (colors.used.length){
-    body.appendChild(groupLabel("사용된 색"));
-    body.appendChild(swatchGrid(colors.used.map(c => ({ hex:c.hex, tag:c.n + "회" }))));
-  }
+  body.appendChild(swatchGrid(colors.used.map(c => ({ hex:c.hex, tag:c.n + "회" }))));
 }
 function groupLabel(text){
   const d = document.createElement("div"); d.className = "grouplabel"; d.textContent = text; return d;

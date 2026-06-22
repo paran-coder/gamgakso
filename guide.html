@@ -130,6 +130,17 @@
   footer{margin-top:48px; padding-top:20px; border-top:1px solid var(--line); color:var(--ink-mid); font-size:12.5px; line-height:1.7}
   footer a{color:var(--ink-mid); text-decoration:none}
   footer a:hover{color:var(--accent)}
+
+  /* 팁 섹션 */
+  .tip-list{display:flex; flex-direction:column; gap:10px}
+  .tip-item{
+    background:var(--card); border:1px solid var(--line); border-radius:4px;
+    padding:16px 20px; box-shadow:var(--shadow);
+    display:grid; grid-template-columns:32px 1fr; gap:12px; align-items:start;
+  }
+  .tip-icon{font-family:var(--font-mono); font-size:13px; font-weight:500; color:var(--accent); padding-top:2px}
+  .tip-body h4{font-family:var(--font-sans); font-size:15px; font-weight:600; margin:0 0 6px}
+  .tip-body p{font-family:var(--font-sans); font-size:14px; font-weight:400; color:var(--ink-mid); margin:0; line-height:1.75}
 </style>
 </head>
 <body>
@@ -205,6 +216,40 @@
         <div class="tab-desc">
           <h4>SVG / EMF / WMF 파일</h4>
           <p>SVG는 브라우저에서 바로 미리보기가 가능합니다. EMF·WMF는 브라우저 렌더가 되지 않아 미리보기 없이 파일 다운로드만 제공됩니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>더 효율적으로 사용하는 팁</h2>
+    <div class="tip-list">
+      <div class="tip-item">
+        <div class="tip-icon">01</div>
+        <div class="tip-body">
+          <h4>색상 코드는 하나씩 클릭해서 복사</h4>
+          <p>색상 칩을 클릭할 때마다 HEX 코드가 클립보드에 덮어씌워집니다. 여러 색상을 정리하려면 하나씩 클릭해서 메모장이나 피그마에 붙여넣는 방식이 가장 빠릅니다. 테마 팔레트 섹션에서 주요 브랜드 색상을 먼저 확인하세요.</p>
+        </div>
+      </div>
+      <div class="tip-item">
+        <div class="tip-icon">02</div>
+        <div class="tip-body">
+          <h4>이미지는 ZIP으로 한 번에 내려받기</h4>
+          <p>ZIP 일괄 다운로드를 사용하면 슬라이드에 삽입된 이미지가 원본 해상도 그대로 저장됩니다. PPT에서 이미지를 개별로 "다른 이름으로 저장"하는 것보다 원본 품질을 유지하는 데 유리합니다.</p>
+        </div>
+      </div>
+      <div class="tip-item">
+        <div class="tip-icon">03</div>
+        <div class="tip-body">
+          <h4>"포함됨" 배지가 붙은 폰트를 주목</h4>
+          <p>폰트 탭에서 "포함됨" 배지가 붙은 폰트는 PPT 파일 안에 직접 임베드된 폰트입니다. 해당 폰트가 내 컴퓨터에 설치되어 있지 않아도 파일 제작자가 어떤 폰트를 사용했는지 이름으로 확인할 수 있습니다.</p>
+        </div>
+      </div>
+      <div class="tip-item">
+        <div class="tip-icon">04</div>
+        <div class="tip-body">
+          <h4>다운로드가 막힌다면 팝업 차단 해제</h4>
+          <p>브라우저 팝업 차단 설정이 파일 다운로드를 막을 수 있습니다. 주소창 오른쪽의 팝업 차단 아이콘을 클릭해 허용으로 변경하면 이미지 개별 다운로드와 ZIP 일괄 다운로드가 정상 작동합니다.</p>
         </div>
       </div>
     </div>
